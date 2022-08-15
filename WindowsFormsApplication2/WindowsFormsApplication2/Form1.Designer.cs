@@ -92,14 +92,16 @@
             this.listBoard.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colTitle,
             this.colContent});
+            this.listBoard.GridLines = true;
             this.listBoard.HideSelection = false;
             this.listBoard.Location = new System.Drawing.Point(12, 229);
+            this.listBoard.MultiSelect = false;
             this.listBoard.Name = "listBoard";
             this.listBoard.Size = new System.Drawing.Size(705, 255);
             this.listBoard.TabIndex = 5;
             this.listBoard.UseCompatibleStateImageBehavior = false;
             this.listBoard.View = System.Windows.Forms.View.Details;
-            this.listBoard.SelectedIndexChanged += new System.EventHandler(this.listBoard_SelectedIndexChanged);
+            this.listBoard.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listDoubleClick);
             // 
             // colTitle
             // 

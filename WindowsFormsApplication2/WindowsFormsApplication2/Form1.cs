@@ -14,7 +14,7 @@ namespace WindowsFormsApplication2
     public partial class Form1 : Form
     {
         DirectoryInfo di = new DirectoryInfo(@"C:\VS2022\TestData");
-        List<string> listData = null;
+        List<string> listData = new List<string>();   // 파일 불러오기 메서드에서 초기화 시킨다.
         public Form1()
         {
             if (!di.Exists) // 게시글 저장 폴더가 없을 경우
@@ -62,22 +62,28 @@ namespace WindowsFormsApplication2
 
         }
 
-        private void listBoard_SelectedIndexChanged(object sender, EventArgs e)
+       
+
+        private void btnTest_Click(object sender, EventArgs e)
         {
-            
+            showList(listData);
+        }
+
+        private void listDoubleClick(object sender, MouseEventArgs e)
+        {
+            Console.WriteLine("선택 : "+listBoard.FocusedItem.);
         }
 
         // ---------------------------------------------
 
         // 1. 파일 저장 메서드 (기본값 : 게시글 txt파일)
-        private bool fileSave(String title, string content, string fileName="\\WindowsFormsApplications2.txt")
+        private bool fileSave(String title, string content, string fileName= "\\WindowsFormsApplications2.txt")
         {
             try
             {
                 StreamWriter sw;    // 파일 쓰기를 위한 StreamWriter class ㅅㅓㄴ언
                 sw = File.AppendText(di + fileName);   // 파일 클래스를 통한 텍스트파일 열기
-                //sw.WriteLine("{\""+title+"\":" + "\""+ content + "\"" + "}");   // "제목":"내용"
-                sw.WriteLine("<title>" + title + "</title>" + "<content>" + content + "</content>");
+                sw.Write("<title>" + title + "</title>" + "<content>" + content + "</content>");
                 sw.Close();
             }
             catch (Exception ex)
@@ -91,15 +97,42 @@ namespace WindowsFormsApplication2
         }
 
         // 2. 파일 불러오기 메서드 (기본값 : 게시글 txt파일)
-        private List<string> fileLoad(string fileName="\\WindowsFormsApplications2.txt")
+        private List<string> fileLoad(string fileName= "\\WindowsFormsApplications2.txt")
         {
             try
             {
-                File.ReadAllText(di + fileName);
-                StreamReader sr;
+                Console.WriteLine("1 : " + fileName);       //  \WindowsFormsApplications2.txt
+                Console.WriteLine("2 : " + di.FullName);    // C:\C:\VS2022\TestData
+                Console.WriteLine("3 : " + di.Name);        // TestData
+                Console.WriteLine("4 : " + di.Root);        // C:\
+                Console.WriteLine("5 : " + di);             // C:\VS2022\TestData
+                Console.WriteLine("6 : " + di + fileName);  // C:\VS2022\TestData\WindowsFormsApplications2.txt
+
+                StreamReader sr = new StreamReader(di.FullName+fileName);
+                String tmpData = sr.ReadToEnd();
+
+                string[] splitStr = { "<title>", "</title>", "<content>", "</content>" };
+                string[] splitData = tmpData.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
+                listData = new List<string>();
+                foreach(string tmp in splitData)
+                {
+                    Console.WriteLine(tmp);
+                    listData.Add(tmp);
+                }
+                splitData = null;   // JAVA와 다르게 DeepCopy가 이루어지므로 GC에서 이 배열은 날릴듯??
+                //Console.WriteLine("0번째 인덱스 : {0}", splitData[0]);
+                //Console.WriteLine("1번째 인덱스 : {0}", splitData[1]);
+                Console.WriteLine("카운트 : "+listData.Count());
+                for (int i = 0; i < listData.Count(); i++)
+                {
+                    Console.WriteLine(i+" 번째 : "+listData[i]);
+                }
+
+                sr.Close();
             }
             catch (FileNotFoundException notFonund) // 파일이 없을시 빈 텍스트파일 생성
             {
+                Console.WriteLine(notFonund.Message);
                 File.Create(di + fileName).Close();
                 return null;
             }
@@ -107,6 +140,7 @@ namespace WindowsFormsApplication2
             {
                 Console.WriteLine("fileLoad Exception : " + ex.Message);
                 MessageBox.Show(ex.Message, "경고");
+                
                 return null;
             }
             
@@ -116,27 +150,38 @@ namespace WindowsFormsApplication2
         // 3. 리스트뷰 초기화 메서드
         private void showList(List<string> listData)
         {
+            fileLoad(); // listData 최신화
             listBoard.Items.Clear();    // 리스트뷰의 데이타(Col, 열) 초기화
                 // 메모리까지 초기화되는가? 문서 찾아볼것
-            ListViewItem lvi = new ListViewItem();
 
-            if (listData == null)
+            if (listData == null)   // 저장된 게시글 데이타가 없을 경우
             {
-                lvi.Text = "표시할 값이 없습니다.";
-                lvi.SubItems.Add("내용에 출력될 값");
+                Console.WriteLine("listData == null");
+                ListViewItem lvi = new ListViewItem();
+
+                lvi.Text = "표시할 값이 없습니다.";  // 제목 열
+                lvi.SubItems.Add("");  // 내용 열
                 // 표시할 글이 없을때 출력할 코드 작성
                 listBoard.Items.Add(lvi);
             }
             else
             {
+                Console.WriteLine("카운트 : "+listData.Count());
+                for(int i=0; i<listData.Count; i+=2)
+                {
+                    Console.WriteLine("i : " + i);
+                    ListViewItem lvi = new ListViewItem();
+                    lvi.Text = (listData[i]);           // 제목 열
+                    lvi.SubItems.Add(listData[i+1]);    // 내용 열
+                    listBoard.Items.Add(lvi);
+                    if ((i + 1) == listData.Count)
+                        break;
+                }
                 
-                // 표시할 데이타가 있을 때
+
             }
         }
 
-        private void btnTest_Click(object sender, EventArgs e)
-        {
-            showList(listData);
-        }
+        
     }
 }
