@@ -14,7 +14,7 @@ namespace WindowsFormsApplication2
     public partial class Form1 : Form
     {
         DirectoryInfo di = new DirectoryInfo(@"C:\VS2022\TestData");
-        List<string> listData = new List<string>();   // 파일 불러오기 메서드에서 초기화 시킨다.
+        string[,] listData = null;   // 파일 불러오기 메서드에서 초기화 시킨다.
         public Form1()
         {
             if (!di.Exists) // 게시글 저장 폴더가 없을 경우
@@ -71,7 +71,8 @@ namespace WindowsFormsApplication2
 
         private void listDoubleClick(object sender, MouseEventArgs e)
         {
-            Console.WriteLine("선택 : "+listBoard.FocusedItem.);
+            Console.WriteLine("선택 : "+listBoard.SelectedIndices.Count); // 열(col)값
+            Console.WriteLine("선택 : " + listBoard.FocusedItem.Index);   // 행(row)값
         }
 
         // ---------------------------------------------
@@ -97,7 +98,7 @@ namespace WindowsFormsApplication2
         }
 
         // 2. 파일 불러오기 메서드 (기본값 : 게시글 txt파일)
-        private List<string> fileLoad(string fileName= "\\WindowsFormsApplications2.txt")
+        private string[,] fileLoad(string fileName= "\\WindowsFormsApplications2.txt")
         {
             try
             {
@@ -113,22 +114,20 @@ namespace WindowsFormsApplication2
 
                 string[] splitStr = { "<title>", "</title>", "<content>", "</content>" };
                 string[] splitData = tmpData.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
-                listData = new List<string>();
-                foreach(string tmp in splitData)
+                //////////////////////////////////////////////////////////
+                string[,] data = new string[splitData.Length / 2, 2];
+                
+                for(int i=0; i<splitData.Length ; i+=2)
                 {
-                    Console.WriteLine(tmp);
-                    listData.Add(tmp);
-                }
-                splitData = null;   // JAVA와 다르게 DeepCopy가 이루어지므로 GC에서 이 배열은 날릴듯??
-                //Console.WriteLine("0번째 인덱스 : {0}", splitData[0]);
-                //Console.WriteLine("1번째 인덱스 : {0}", splitData[1]);
-                Console.WriteLine("카운트 : "+listData.Count());
-                for (int i = 0; i < listData.Count(); i++)
-                {
-                    Console.WriteLine(i+" 번째 : "+listData[i]);
+                    data[i/2, 0] = splitData[i];
+                    data[i/2, 1] = splitData[i+1];
                 }
 
+
+               
+
                 sr.Close();
+                return data;
             }
             catch (FileNotFoundException notFonund) // 파일이 없을시 빈 텍스트파일 생성
             {
@@ -140,15 +139,14 @@ namespace WindowsFormsApplication2
             {
                 Console.WriteLine("fileLoad Exception : " + ex.Message);
                 MessageBox.Show(ex.Message, "경고");
-                
+
                 return null;
             }
             
-            return null;
         }
 
         // 3. 리스트뷰 초기화 메서드
-        private void showList(List<string> listData)
+        private void showList(string[,] listData)
         {
             fileLoad(); // listData 최신화
             listBoard.Items.Clear();    // 리스트뷰의 데이타(Col, 열) 초기화
@@ -166,22 +164,20 @@ namespace WindowsFormsApplication2
             }
             else
             {
-                Console.WriteLine("카운트 : "+listData.Count());
-                for(int i=0; i<listData.Count; i+=2)
+                for(int i=0; i<listData.GetLength(0); i++)  // x값의 길이
                 {
                     Console.WriteLine("i : " + i);
                     ListViewItem lvi = new ListViewItem();
-                    lvi.Text = (listData[i]);           // 제목 열
-                    lvi.SubItems.Add(listData[i+1]);    // 내용 열
+                    lvi.Text = (listData[i,0]);           // 제목 열
+                    lvi.SubItems.Add(listData[i,1]);    // 내용 열
                     listBoard.Items.Add(lvi);
-                    if ((i + 1) == listData.Count)
-                        break;
                 }
-                
-
             }
         }
 
-        
+        private void listBoard_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
