@@ -36,6 +36,7 @@
             this.listBoard = new System.Windows.Forms.ListView();
             this.colTitle = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colContent = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.btnTest = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lblTitle
@@ -63,7 +64,7 @@
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(178, 158);
             this.btnSave.TabIndex = 2;
-            this.btnSave.Text = "button1";
+            this.btnSave.Text = "저장";
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -110,11 +111,22 @@
             this.colContent.Text = "내용";
             this.colContent.Width = 470;
             // 
+            // btnTest
+            // 
+            this.btnTest.Location = new System.Drawing.Point(693, 106);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(23, 57);
+            this.btnTest.TabIndex = 6;
+            this.btnTest.Text = "button1";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(729, 496);
+            this.Controls.Add(this.btnTest);
             this.Controls.Add(this.listBoard);
             this.Controls.Add(this.txtContent);
             this.Controls.Add(this.lblContent);
@@ -138,6 +150,7 @@
         private System.Windows.Forms.ListView listBoard;
         private System.Windows.Forms.ColumnHeader colTitle;
         private System.Windows.Forms.ColumnHeader colContent;
+        private System.Windows.Forms.Button btnTest;
     }
 }
 

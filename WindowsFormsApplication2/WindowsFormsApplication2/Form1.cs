@@ -14,15 +14,15 @@ namespace WindowsFormsApplication2
     public partial class Form1 : Form
     {
         DirectoryInfo di = new DirectoryInfo(@"C:\VS2022\TestData");
-        string saveFileName = "\\WindowsFormsApplications2.txt";
+        List<string> listData = null;
         public Form1()
         {
-            if (!di.Exists)
-                di.Create();
-            List<string> boardData = fileLoad();
-
-            InitializeComponent();
-            
+            if (!di.Exists) // 게시글 저장 폴더가 없을 경우
+            {
+                di.Create();    // 폴더 생성
+            }
+            listData = fileLoad();  // 파일 불러오기(인수 기본값 : 게시글 파일)
+            InitializeComponent();  // 컴포넌트 초기화 매서드
         }
 
         private void txtContent_TextChanged(object sender, EventArgs e)
@@ -69,14 +69,15 @@ namespace WindowsFormsApplication2
 
         // ---------------------------------------------
 
-        // 1.파일처리 메서드
-        private bool fileSave(String title, string content)
+        // 1. 파일 저장 메서드 (기본값 : 게시글 txt파일)
+        private bool fileSave(String title, string content, string fileName="\\WindowsFormsApplications2.txt")
         {
             try
             {
                 StreamWriter sw;    // 파일 쓰기를 위한 StreamWriter class ㅅㅓㄴ언
-                sw = File.AppendText(di + saveFileName);   // 파일 클래스를 통한 텍스트파일 열기
-                sw.WriteLine(title + "|" + content);
+                sw = File.AppendText(di + fileName);   // 파일 클래스를 통한 텍스트파일 열기
+                //sw.WriteLine("{\""+title+"\":" + "\""+ content + "\"" + "}");   // "제목":"내용"
+                sw.WriteLine("<title>" + title + "</title>" + "<content>" + content + "</content>");
                 sw.Close();
             }
             catch (Exception ex)
@@ -89,20 +90,18 @@ namespace WindowsFormsApplication2
             return true;
         }
 
-        private List<string> fileLoad()
+        // 2. 파일 불러오기 메서드 (기본값 : 게시글 txt파일)
+        private List<string> fileLoad(string fileName="\\WindowsFormsApplications2.txt")
         {
             try
             {
-                File.ReadAllText(di + saveFileName);
+                File.ReadAllText(di + fileName);
                 StreamReader sr;
             }
-            catch (FileNotFoundException notFonund)
+            catch (FileNotFoundException notFonund) // 파일이 없을시 빈 텍스트파일 생성
             {
-                File.Create(di + saveFileName);
+                File.Create(di + fileName).Close();
                 return null;
-                // Console.WriteLine("fileLoad Exception : "+ notFonund.Message);
-                // MessageBox.Show(notFonund.Message, "경고");
-
             }
             catch (Exception ex)
             {
@@ -111,8 +110,33 @@ namespace WindowsFormsApplication2
                 return null;
             }
             
-            return new List<string>();
+            return null;
         }
 
+        // 3. 리스트뷰 초기화 메서드
+        private void showList(List<string> listData)
+        {
+            listBoard.Items.Clear();    // 리스트뷰의 데이타(Col, 열) 초기화
+                // 메모리까지 초기화되는가? 문서 찾아볼것
+            ListViewItem lvi = new ListViewItem();
+
+            if (listData == null)
+            {
+                lvi.Text = "표시할 값이 없습니다.";
+                lvi.SubItems.Add("내용에 출력될 값");
+                // 표시할 글이 없을때 출력할 코드 작성
+                listBoard.Items.Add(lvi);
+            }
+            else
+            {
+                
+                // 표시할 데이타가 있을 때
+            }
+        }
+
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            showList(listData);
+        }
     }
 }
